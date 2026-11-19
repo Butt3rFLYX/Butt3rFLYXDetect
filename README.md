@@ -2,24 +2,24 @@
 
 > **SEE EVERY MOTION. TRACK THE MOVEMENT. UNDERSTAND THE ACTION.**
 
-Butt3rFLYX ist eine Desktop-Anwendung zur **lokalen, transparenten** Bewegungsanalyse per Webcam.
-Sie kombiniert **YOLO11-Pose** (Ganzkörper-Skelett + Tracking), **MediaPipe Hand Landmarker**
-(21 Punkte pro Hand) und **MediaPipe Face Landmarker** (478 Punkte inkl. Iris) zu einer zentralen
-Action-Recognition-Engine – mit Cyberpunk-Intro, Live-Dashboard, Ereignis-Timeline und Protokollierung.
+Butt3rFLYX is a desktop application for **local, transparent** motion analysis via webcam.
+It combines **YOLO11-Pose** (full-body skeleton + tracking), **MediaPipe Hand Landmarker**
+(21 points per hand) and **MediaPipe Face Landmarker** (478 points incl. iris) into a central
+action recognition engine – with a cyberpunk intro, live dashboard, event timeline and logging.
 
-Hervorgegangen aus `action_recognition_app.py` (weiterhin enthalten und lauffähig, siehe [Legacy-Modus](#legacy-modus)).
-
----
-
-## Inhalt
-1. [Schnellstart](#schnellstart) · 2. [Voraussetzungen](#voraussetzungen) · 3. [Bedienung & Tasten](#bedienung--tastenkombinationen)
-4. [Einstellungen](#einstellungen) · 5. [Was wird erkannt?](#was-wird-erkannt) · 6. [Modelle & Kameras](#unterstützte-modelle--kameras)
-7. [Performance](#performance) · 8. [Logging & Export](#logging--export) · 9. [Datenschutz](#datenschutz)
-10. [Grenzen](#erkennungsgrenzen) · 11. [Fehlerbehebung](#fehlerbehebung) · 12. [Tests](#tests) · 13. [Architektur](#architektur)
+Evolved from `action_recognition_app.py` (still included and runnable, see [Legacy mode](#legacy-mode)).
 
 ---
 
-## Schnellstart
+## Contents
+1. [Quick start](#quick-start) · 2. [Requirements](#requirements) · 3. [Usage & keys](#usage--keyboard-shortcuts)
+4. [Settings](#settings) · 5. [What is detected?](#what-is-detected) · 6. [Models & cameras](#supported-models--cameras)
+7. [Performance](#performance) · 8. [Logging & export](#logging--export) · 9. [Privacy](#privacy)
+10. [Limitations](#detection-limitations) · 11. [Troubleshooting](#troubleshooting) · 12. [Tests](#tests) · 13. [Architecture](#architecture)
+
+---
+
+## Quick start
 
 ```bash
 cd Butt3rFLYX
@@ -29,188 +29,188 @@ pip install -r requirements.txt
 python main.py
 ```
 
-Beim ersten Start fragt macOS nach der **Kamera-Berechtigung** für das Terminal bzw. Python – bitte erlauben.
-Die Modelle liegen bereits in `models/`. Fehlt eine Datei, wird sie automatisch aus der offiziellen Quelle
-geladen (Ultralytics bzw. Google MediaPipe); abschaltbar mit `"allow_model_download": false` in `config.json`.
+On first launch, macOS asks for **camera permission** for the Terminal or Python – please allow it.
+The models are already in `models/`. If a file is missing, it is downloaded automatically from the official
+source (Ultralytics or Google MediaPipe); this can be disabled with `"allow_model_download": false` in `config.json`.
 
-Nützliche Startoptionen:
+Useful launch options:
 
-| Option | Wirkung |
+| Option | Effect |
 |---|---|
-| `--no-intro` | Intro überspringen |
-| `--camera 1` | andere Kamera |
-| `--source video.mp4` | Videodatei statt Webcam (läuft in Schleife) |
-| `--mode eco\|balanced\|ultra` | Performance-Modus |
-| `--lang de` | deutsche Oberfläche |
-| `--reset-config` | mit Standardeinstellungen starten |
-| `--legacy` | ursprüngliches OpenCV-Programm starten |
+| `--no-intro` | skip the intro |
+| `--camera 1` | use a different camera |
+| `--source video.mp4` | video file instead of webcam (loops) |
+| `--mode eco\|balanced\|ultra` | performance mode |
+| `--lang de` | German interface |
+| `--reset-config` | start with default settings |
+| `--legacy` | start the original OpenCV program |
 
-## Voraussetzungen
+## Requirements
 
-- **Python 3.10 – 3.13** (entwickelt und getestet mit **Python 3.13.12**, macOS 27, Apple Silicon)
-- Webcam (beliebige UVC-/eingebaute Kamera, die OpenCV öffnen kann) oder eine Videodatei
-- Bibliotheken (`requirements.txt`): `ultralytics` (inkl. PyTorch), `opencv-python`, `numpy`, `lap`,
-  `PySide6`, `mediapipe`, für Tests `pytest`. Optional: `face_recognition`.
-- GPU optional: **CUDA** (NVIDIA) oder **MPS** (Apple Silicon) werden automatisch erkannt, sonst CPU.
+- **Python 3.10 – 3.13** (developed and tested with **Python 3.13.12**, macOS 27, Apple Silicon)
+- Webcam (any UVC/built-in camera OpenCV can open) or a video file
+- Libraries (`requirements.txt`): `ultralytics` (incl. PyTorch), `opencv-python`, `numpy`, `lap`,
+  `PySide6`, `mediapipe`, `pytest` for tests. Optional: `face_recognition`.
+- GPU optional: **CUDA** (NVIDIA) or **MPS** (Apple Silicon) are detected automatically, otherwise CPU.
 
-## Bedienung & Tastenkombinationen
+## Usage & keyboard shortcuts
 
-Ablauf beim Start: schwarzer Bildschirm → Partikel + Boot-Terminal → digitaler Neon-Schmetterling
-(schlägt mit den Flügeln, zerfällt in Partikel) → Glitch-Logo **B U T T 3 R F L Y X** → **echter**
-Systemstatus (Modelle/Kamera, die währenddessen im Hintergrund geladen werden) → Scan-Übergang → Dashboard.
-Das Intro ist mit **ESC / Leertaste / Klick** überspringbar und in den Einstellungen abschaltbar.
-Falls die Modelle am Ende des Intros noch laden, wartet es mit „SYNCHRONIZING NEURAL CORES“ (max. 25 s).
+Startup sequence: black screen → particles + boot terminal → digital neon butterfly
+(flaps its wings, dissolves into particles) → glitch logo **B U T T 3 R F L Y X** → **real**
+system status (models/camera, loaded in the background meanwhile) → scan transition → dashboard.
+The intro can be skipped with **ESC / Space / click** and disabled in the settings.
+If the models are still loading at the end of the intro, it waits with "SYNCHRONIZING NEURAL CORES" (max. 25 s).
 
-| Taste | Funktion | Taste | Funktion |
+| Key | Function | Key | Function |
 |---|---|---|---|
-| `Leertaste` | Tracking pausieren / fortsetzen | `S` | Einstellungen |
-| `R` | Videoaufnahme starten/stoppen | `E` | Ereignisse exportieren |
-| `L` | Logging an/aus | `G` | Gestensteuerung an/aus |
-| `K` | Skelett | `H` | gesamtes HUD |
-| `F` | Hand-Landmarks | `A` | Gelenkwinkel |
-| `V` | Bewegungsvektoren | `T` | Trajektorien |
-| `M` | Anzeige spiegeln | `F11` | Vollbild |
-| `F1` | Hilfe | `Q` / `ESC` | Beenden |
+| `Space` | pause / resume tracking | `S` | settings |
+| `R` | start/stop video recording | `E` | export events |
+| `L` | logging on/off | `G` | gesture control on/off |
+| `K` | skeleton | `H` | entire HUD |
+| `F` | hand landmarks | `A` | joint angles |
+| `V` | motion vectors | `T` | trajectories |
+| `M` | mirror display | `F11` | fullscreen |
+| `F1` | help | `Q` / `ESC` | quit |
 
-**Dashboard:** oben Statusleiste (System, Kamera, **gemessene** FPS, Personenzahl, Modus, Gerät, LOG/REC),
-links das Kamerabild mit HUD, rechts KI-Modul-Status (mit Laufzeit pro Modell) und eine Karte pro Person
-(Haltung, Bewegung, Körperausrichtung, Kopf, Blick, linke/rechte Hand mit Fingerstatus `T I M R P`,
-aktive Aktionen, Konfidenz), unten die Ereignis-Timeline.
+**Dashboard:** status bar at the top (system, camera, **measured** FPS, person count, mode, device, LOG/REC),
+camera image with HUD on the left, AI module status (with runtime per model) and one card per person on the right
+(posture, movement, body orientation, head, gaze, left/right hand with finger status `T I M R P`,
+active actions, confidence), event timeline at the bottom.
 
-**Skelett-Farben:** Cyan = normal · Violett = Geste erkannt · Grün = Aktion/Übergang erkannt ·
-Gelb = unsichere Erkennung (gestrichelte Knochen = Keypoint-Konfidenz < 0.55) · Rot = möglicher Sturz.
+**Skeleton colors:** cyan = normal · violet = gesture detected · green = action/transition detected ·
+yellow = uncertain detection (dashed bones = keypoint confidence < 0.55) · red = possible fall.
 
-## Einstellungen
+## Settings
 
-Alle Einstellungen (`S`) werden in `config.json` gespeichert und beim nächsten Start geladen.
-Eine fehlerhafte Datei wird nach `config.json.bak` gesichert, ungültige Werte werden auf Standard zurückgesetzt
-und in der Timeline gemeldet.
+All settings (`S`) are saved to `config.json` and loaded on the next start.
+A corrupted file is backed up to `config.json.bak`, invalid values are reset to defaults
+and reported in the timeline.
 
-| Bereich | Einstellungen |
+| Section | Settings |
 |---|---|
-| Kamera | Index (mit Kamerasuche), Videodatei, Auflösung, FPS-Ziel, Spiegeln |
-| KI / Modelle | Pose-Modell (n/s/m), Gerät (auto/cpu/mps/cuda), Performance-Modus, Personen- und Keypoint-Konfidenzschwelle, Tracking-Empfindlichkeit, Mindestdauer für Ereignisse, Module Pose/Hände/Kopf an/aus |
-| Anzeige | HUD, Skelett, Rahmen, Hand-Landmarks, Fingerbeschriftung, Gelenkwinkel, Vektoren, Trajektorien, Kopfpfeil, Gesichtspunkte, Intro, Intro-Sound, reduzierte Effekte, Sprache DE/EN |
-| Logging | an/aus, Formate CSV/JSON/TXT/SQLite, Ordner, Exportformat, Aufnahmeordner |
-| Steuerung / Datenschutz | Gestensteuerung + Haltezeit, Gesichtsidentität (Namen) |
+| Camera | index (with camera scan), video file, resolution, target FPS, mirror |
+| AI / models | pose model (n/s/m), device (auto/cpu/mps/cuda), performance mode, person and keypoint confidence threshold, tracking sensitivity, minimum event duration, pose/hands/head modules on/off |
+| Display | HUD, skeleton, boxes, hand landmarks, finger labels, joint angles, vectors, trajectories, head arrow, face points, intro, intro sound, reduced effects, language DE/EN |
+| Logging | on/off, formats CSV/JSON/TXT/SQLite, folder, export format, recording folder |
+| Control / privacy | gesture control + hold time, face identity (names) |
 
-## Was wird erkannt?
+## What is detected?
 
-**Die vollständige, automatisch erzeugte Tabelle aller 131 Erkennungen steht in [`docs/features.md`](docs/features.md)**
-(Status, benötigtes Modell, Testabdeckung). Kurzüberblick:
+**The complete, auto-generated table of all 131 detections is in [`docs/features.md`](docs/features.md)**
+(status, required model, test coverage). Overview:
 
-| Bereich | Erkennungen | Modell |
+| Area | Detections | Model |
 |---|---|---|
-| Körperhaltung | Stehen, Sitzen, Hocke, tiefe Hocke, Ducken, Knien, Kniestand auf einem Knie, Liegen (+ Rücken/Bauch/Seite exp.), Vorbeugen, Liegestütz-Position, Ausfallschritt, Oberkörper aufrecht | YOLO Pose |
-| Pose-Details | Lehnen links/rechts/vorne/hinten, Stand auf einem Bein, Knie gehoben, Arme verschränkt, Hände in den Hüften, Hand/Hände heben, Hände über/hinter dem Kopf, T-/Y-/A-Pose, Arm gestreckt, Strecken, Oberkörper verdreht | YOLO Pose |
-| Ausrichtung | zur Kamera, seitlich, Rücken zur Kamera | YOLO Pose |
-| Bewegung | Stillstehen, ruhig, langsam/normal/schnell gehen, laufen, rennen, springen, wiederholt springen, hüpfen auf einem Bein, seitwärts, rückwärts, auf die Kamera zu / weg, gehen/laufen auf der Stelle, Bewegungsrichtung im Bild, möglicher Sturz, Stolpern, Drehen | YOLO Pose |
-| Übergänge | hinsetzen, aufstehen, in die Hocke, aus der Hocke, bücken, aufrichten, hinlegen, vom Boden aufstehen, Drehung 90°/180°/360° | YOLO Pose |
-| Sport | Kniebeugen (Zähler), Hampelmann (Zähler), Armkreisen, Beinheben (Zähler), Balance auf einem Bein (Dauer), Winken L/R, wiederholte Arm-/Beinbewegungen | YOLO Pose |
-| Kopf | geradeaus, links, rechts, oben, unten, geneigt L/R (mit Winkel), von der Kamera weg, dreht sich, nickt, schüttelt, schaut ca. zur Kamera | Face Landmarker (Fallback: grob aus YOLO) |
-| Blick | links, rechts, oben, unten, Mitte, Augen geschlossen – **nur wenn zuverlässig**, sonst „UNSICHER → NUR KOPFRICHTUNG“ | Face Landmarker (Iris) |
-| Hand / Finger | Hand sichtbar (L/R), Fingerstatus je Finger, Fingeranzahl, Handfläche/Handrücken, offene Hand, Faust, Daumen hoch/runter, Peace, OK, Rock, drei/vier Finger, Zeigen oben/unten/links/rechts/zur Kamera, Hand vor dem Gesicht | Hand Landmarker |
-| Handbewegung | Winken, Hand nach links/rechts/oben/unten, Hand öffnen/schließen, Hand drehen, Finger bewegen | Hand Landmarker |
-| Zwei Hände | Hände zusammen, Klatschen, Herz, mit beiden Händen zeigen, Hände auseinander/zueinander | Hand Landmarker |
+| Posture | standing, sitting, squat, deep squat, crouching, kneeling, kneeling on one knee, lying (+ back/stomach/side exp.), bending forward, push-up position, lunge, upright upper body | YOLO Pose |
+| Pose details | leaning left/right/forward/back, standing on one leg, knee raised, arms crossed, hands on hips, raising hand/hands, hands above/behind head, T/Y/A pose, arm extended, stretching, twisted torso | YOLO Pose |
+| Orientation | facing camera, sideways, back to camera | YOLO Pose |
+| Movement | standing still, calm, slow/normal/fast walking, jogging, running, jumping, repeated jumping, hopping on one leg, sideways, backwards, towards / away from camera, walking/running in place, direction of movement in the image, possible fall, stumbling, turning | YOLO Pose |
+| Transitions | sitting down, standing up, squatting down, rising from squat, bending down, straightening up, lying down, getting up from the floor, turn 90°/180°/360° | YOLO Pose |
+| Exercise | squats (counter), jumping jacks (counter), arm circles, leg raises (counter), one-leg balance (duration), waving L/R, repeated arm/leg movements | YOLO Pose |
+| Head | forward, left, right, up, down, tilted L/R (with angle), away from camera, turning, nodding, shaking, looking roughly at camera | Face Landmarker (fallback: rough from YOLO) |
+| Gaze | left, right, up, down, center, eyes closed – **only when reliable**, otherwise "UNCERTAIN → HEAD DIRECTION ONLY" | Face Landmarker (iris) |
+| Hand / fingers | hand visible (L/R), status per finger, finger count, palm/back of hand, open hand, fist, thumbs up/down, peace, OK, rock, three/four fingers, pointing up/down/left/right/at camera, hand in front of face | Hand Landmarker |
+| Hand movement | waving, hand left/right/up/down, opening/closing hand, rotating hand, moving fingers | Hand Landmarker |
+| Two hands | hands together, clapping, heart, pointing with both hands, hands apart/towards each other | Hand Landmarker |
 
-**Links/Rechts:** Körperseiten (Hand, Arm, Knie, Kopfdrehung, Neigung, Zeigerichtung) sind immer **aus Sicht
-der Person** angegeben. Bewegungsrichtungen durch das Bild sind ausdrücklich als „BILD-LINKS/-RECHTS“ beschriftet.
+**Left/right:** body sides (hand, arm, knee, head turn, tilt, pointing direction) are always given **from the
+person's perspective**. Directions of movement across the image are explicitly labeled "IMAGE LEFT/RIGHT".
 
-**Experimentelle** Erkennungen werden im Interface gelb bzw. mit `(EXP)` markiert.
+**Experimental** detections are marked yellow or with `(EXP)` in the interface.
 
-### Gestensteuerung (standardmäßig AUS)
+### Gesture control (OFF by default)
 
-| Geste (1 s halten) | Befehl |
+| Gesture (hold 1 s) | Command |
 |---|---|
-| Daumen hoch | Bestätigen |
-| Offene Hand | Tracking pausieren |
-| Faust | Tracking fortsetzen |
-| Peace | Skelett ein/aus |
-| Beide Hände über dem Kopf | Einstellungen öffnen |
+| Thumbs up | confirm |
+| Open hand | pause tracking |
+| Fist | resume tracking |
+| Peace | skeleton on/off |
+| Both hands above head | open settings |
 
-Haltezeit einstellbar, danach 2 s Sperrzeit; ein Fortschrittsring zeigt die Haltedauer an.
+Hold time is configurable, followed by a 2 s cooldown; a progress ring shows the hold duration.
 
-## Unterstützte Modelle & Kameras
+## Supported models & cameras
 
-- **Pose:** `models/yolo11n-pose.pt` (Standard, schnell). Genauer: `yolo11s-pose.pt` / `yolo11m-pose.pt`
-  (werden bei Auswahl automatisch geladen). Andere Ultralytics-Pose-Modelle (`.pt`, `.onnx`) über „…“ wählbar.
-- **Hände:** `models/hand_landmarker.task` (MediaPipe, float16).
-- **Gesicht/Kopf/Iris:** `models/face_landmarker.task` (MediaPipe, float16).
-- **Kameras:** alles, was OpenCV öffnen kann (macOS: AVFoundation, Windows: DirectShow, Linux: V4L2), plus Videodateien.
-  Die Kamera wird bei Signalverlust alle 2 s automatisch neu verbunden.
+- **Pose:** `models/yolo11n-pose.pt` (default, fast). More accurate: `yolo11s-pose.pt` / `yolo11m-pose.pt`
+  (downloaded automatically when selected). Other Ultralytics pose models (`.pt`, `.onnx`) can be selected via "…".
+- **Hands:** `models/hand_landmarker.task` (MediaPipe, float16).
+- **Face/head/iris:** `models/face_landmarker.task` (MediaPipe, float16).
+- **Cameras:** anything OpenCV can open (macOS: AVFoundation, Windows: DirectShow, Linux: V4L2), plus video files.
+  On signal loss the camera reconnects automatically every 2 s.
 
 ## Performance
 
-| Modus | YOLO-Eingabe | Hände | Gesichter | gemessen* |
+| Mode | YOLO input | Hands | Faces | measured* |
 |---|---|---|---|---|
-| ECO | 320 px | jedes 3. Bild, max. 2 | jedes 4. Bild, max. 1 | ≈ 55–60 FPS |
-| BALANCED | 480 px | jedes 2. Bild, max. 4 | jedes 2. Bild, max. 2 | ≈ 37 FPS |
-| ULTRA | 640 px | jedes Bild, max. 6 | jedes Bild, max. 4 | ≈ 25 FPS |
+| ECO | 320 px | every 3rd frame, max. 2 | every 4th frame, max. 1 | ≈ 55–60 FPS |
+| BALANCED | 480 px | every 2nd frame, max. 4 | every 2nd frame, max. 2 | ≈ 37 FPS |
+| ULTRA | 640 px | every frame, max. 6 | every frame, max. 4 | ≈ 25 FPS |
 
-\* Reine Verarbeitungsrate der Pipeline mit 3 Personen und allen Modulen, Apple Silicon, ohne Kamera-Limit.
-Mit Webcam begrenzt meist die Kamera (typisch 30 FPS). Die Werte hängen stark von Hardware, Auflösung und
-Personenzahl ab.
+\* Pure pipeline processing rate with 3 people and all modules, Apple Silicon, no camera limit.
+With a webcam, the camera is usually the bottleneck (typically 30 FPS). Values depend heavily on hardware,
+resolution and number of people.
 
-Optimierungen: MediaPipe läuft **parallel** zu YOLO in einem eigenen Thread und nur auf **Ausschnitten** um Kopf
-und Handgelenke jeder Person (findet auch kleine/entfernte Hände); Ergebnisse werden zwischen übersprungenen
-Frames weiterverwendet; begrenzte Verlaufspuffer (4 s); Kamera, KI und HUD-Rendering laufen in einem
-Hintergrund-Thread, die Oberfläche bleibt flüssig.
+Optimizations: MediaPipe runs **in parallel** to YOLO in its own thread and only on **crops** around the head
+and wrists of each person (also finds small/distant hands); results are reused across skipped
+frames; bounded history buffers (4 s); camera, AI and HUD rendering run in a
+background thread, so the interface stays smooth.
 
-Tipps: ECO-Modus, Auflösung 960×540, „Animationseffekte reduzieren“, nicht benötigte Module abschalten,
-gute Beleuchtung, Kamera auf Brust- bis Kopfhöhe, ganze Person im Bild.
+Tips: ECO mode, 960×540 resolution, "reduce animation effects", disable unneeded modules,
+good lighting, camera at chest to head height, whole person in frame.
 
-## Logging & Export
+## Logging & export
 
-- Logging ist **standardmäßig aus** (`L` oder Einstellungen). Dateien landen in `logs/`:
-  `butt3rflyx_<Datum>_<Zeit>.csv`, `.jsonl` (JSON Lines, absturzsicher), `.txt`, sowie `butt3rflyx.db` (SQLite).
-- Gespeichert werden nur **tatsächlich erkannte** Ereignisse bei Zustandsänderungen (entprellt über die
-  Mindestdauer), keine doppelten Einträge pro Frame:
+- Logging is **off by default** (`L` or settings). Files go to `logs/`:
+  `butt3rflyx_<date>_<time>.csv`, `.jsonl` (JSON Lines, crash-safe), `.txt`, and `butt3rflyx.db` (SQLite).
+- Only **actually detected** events on state changes are stored (debounced via the
+  minimum duration), no duplicate entries per frame:
   `timestamp, person_id, event_type, label, text, posture, movement, head_direction, left_hand, right_hand, confidence, duration_s`.
-  `duration_s` = Dauer des vorherigen Zustands bzw. der beendeten Aktion.
-- `E` exportiert alle Ereignisse der laufenden Sitzung als JSON, CSV, TXT oder SQLite.
+  `duration_s` = duration of the previous state or of the finished action.
+- `E` exports all events of the current session as JSON, CSV, TXT or SQLite.
 
-Beispiel (JSON Lines):
+Example (JSON Lines):
 ```json
 {"timestamp": "2026-11-19T17:30:05.120", "person_id": 1, "event_type": "state", "label": "walking",
  "text": "PERSON 001 STARTED WALKING 2.1 T/s", "posture": "standing", "movement": "walking",
  "head_direction": "head_left", "left_hand": null, "right_hand": "pointing_right", "confidence": 0.81, "duration_s": 4.2}
 ```
 
-## Datenschutz
+## Privacy
 
-- Alle Verarbeitung erfolgt **lokal**; es werden keine Bilder oder Daten versendet (Netzwerk nur für den
-  einmaligen, abschaltbaren Modell-Download).
-- **Keine Videoaufnahme ohne ausdrückliche Aktion:** Aufnahme nur per `R`/REC-Knopf, sichtbar durch rotes
-  `● REC` in der Statusleiste; Speicherort `recordings/`.
-- Der Logger speichert **keine Bilder**, nur Textereignisse – und nur wenn Logging eingeschaltet ist.
-- Tracking-IDs sind **temporär** und rein positionsbasiert (keine Biometrie).
-- Die optionale **Gesichtsidentität** (Namen aus `known_faces/<Name>/<Bilder>`, Funktion des Originalprogramms)
-  ist **standardmäßig aus**, benötigt `pip install face_recognition` und hält Gesichts-Encodings nur im Arbeitsspeicher.
-- Bitte nur Personen erfassen, die über die Analyse informiert sind.
+- All processing happens **locally**; no images or data are sent anywhere (network only for the
+  one-time, optional model download).
+- **No video recording without explicit action:** recording only via `R`/REC button, visible as a red
+  `● REC` in the status bar; saved to `recordings/`.
+- The logger stores **no images**, only text events – and only when logging is enabled.
+- Tracking IDs are **temporary** and purely position-based (no biometrics).
+- The optional **face identity** (names from `known_faces/<name>/<images>`, a feature of the original program)
+  is **off by default**, requires `pip install face_recognition` and keeps face encodings in memory only.
+- Please only capture people who have been informed about the analysis.
 
-## Erkennungsgrenzen
+## Detection limitations
 
-Ausführlich in [`docs/limitations.md`](docs/limitations.md). Das Wichtigste:
+Details in [`docs/limitations.md`](docs/limitations.md). Key points:
 
-- Eine einzelne 2D-Kamera kann Tiefe nicht messen: Sitzen vs. Hocke, Rücken- vs. Bauchlage, Vorbeugen vs.
-  Hinlegen und Drehrichtung sind teils mehrdeutig → solche Erkennungen sind als experimentell markiert.
-- **Blickrichtung** ist nur bei nahem, frontalem, gut beleuchtetem Gesicht zuverlässig; sonst zeigt das System
-  nur die **Kopfrichtung** und „UNSICHER“.
-- Hände werden nur gefunden, wenn YOLO das Handgelenk der Person sieht. Hände ohne sichtbaren Körper werden nicht ausgewertet.
-- Alle Schwellwerte sind regelbasiert und wurden mit synthetischen Daten, zwei Beispielfotos und einem
-  künstlichen Testvideo geprüft – **nicht** systematisch mit echten Webcam-Aufnahmen. Bitte live kalibrieren.
+- A single 2D camera cannot measure depth: sitting vs. squatting, lying on back vs. stomach, bending forward vs.
+  lying down, and direction of rotation are partly ambiguous → such detections are marked experimental.
+- **Gaze direction** is only reliable with a close, frontal, well-lit face; otherwise the system shows
+  only the **head direction** and "UNCERTAIN".
+- Hands are only found if YOLO sees the person's wrist. Hands without a visible body are not evaluated.
+- All thresholds are rule-based and were checked with synthetic data, two sample photos and an
+  artificial test video – **not** systematically with real webcam footage. Please calibrate live.
 
-## Fehlerbehebung
+## Troubleshooting
 
-| Problem | Lösung |
+| Problem | Solution |
 |---|---|
-| „NO SIGNAL“ / Kamera nicht gefunden | macOS: Systemeinstellungen → Datenschutz & Sicherheit → Kamera → Terminal/Python erlauben. Anderen Index in den Einstellungen („SCAN CAMERAS“) wählen. Kamera nicht in anderer App geöffnet lassen. |
-| Pose-Modell lädt nicht | AI-MODULES-Panel/Timeline zeigt den Fehler. Datei `models/yolo11n-pose.pt` prüfen oder Download erlauben. Ohne Pose-Modell zeigt das Dashboard nur das Kamerabild. |
-| Hände/Kopf „ERROR“ | `pip install mediapipe` bzw. `.task`-Dateien in `models/` prüfen. Die übrigen Module laufen weiter. |
-| Niedrige FPS | ECO-Modus, kleinere Auflösung, Module abschalten, „Effekte reduzieren“. |
-| Falsche Seite links/rechts | Links/rechts ist aus Sicht der Person. Spiegeln (`M`) ändert nur die Anzeige, nie die Analyse. |
-| Konfiguration kaputt | Wird automatisch gesichert und ersetzt; alternativ `python main.py --reset-config`. |
-| GPU wird nicht genutzt | Einstellungen → Gerät; bei Fehlern fällt das System automatisch auf CPU zurück. |
+| "NO SIGNAL" / camera not found | macOS: System Settings → Privacy & Security → Camera → allow Terminal/Python. Choose another index in the settings ("SCAN CAMERAS"). Don't keep the camera open in another app. |
+| Pose model doesn't load | The AI MODULES panel/timeline shows the error. Check `models/yolo11n-pose.pt` or allow the download. Without a pose model the dashboard shows only the camera image. |
+| Hands/head "ERROR" | `pip install mediapipe` or check the `.task` files in `models/`. The other modules keep running. |
+| Low FPS | ECO mode, smaller resolution, disable modules, "reduce effects". |
+| Wrong side left/right | Left/right is from the person's perspective. Mirroring (`M`) only changes the display, never the analysis. |
+| Broken configuration | Backed up and replaced automatically; alternatively `python main.py --reset-config`. |
+| GPU not used | Settings → device; on errors the system falls back to CPU automatically. |
 
 ## Tests
 
@@ -218,54 +218,54 @@ Ausführlich in [`docs/limitations.md`](docs/limitations.md). Das Wichtigste:
 python -m pytest -q
 ```
 
-99 Tests: Geometrie, alle Körperhaltungen, Bewegungen und Übergänge (synthetische Sequenzen), Hand-/Fingergesten
-und Handbewegungen, Kopf/Blick, Tracking-IDs, Ereignis-Engine (Entprellung, Dauer), Logging/Export in allen
-Formaten, Konfiguration (inkl. defekter Datei), Gestensteuerung, Fehlerbehandlung (fehlende Modelle/Kamera),
-echte Modelle auf Beispielfotos sowie das Rendern von Intro, HUD und Dashboard (offscreen).
-**Nur mit echter Webcam prüfbar:** Live-Genauigkeit, Kamera-Wiederverbindung, Gestensteuerung im Alltag,
-tatsächliche FPS deiner Hardware.
+99 tests: geometry, all postures, movements and transitions (synthetic sequences), hand/finger gestures
+and hand movements, head/gaze, tracking IDs, event engine (debouncing, duration), logging/export in all
+formats, configuration (incl. corrupted file), gesture control, error handling (missing models/camera),
+real models on sample photos, and rendering of intro, HUD and dashboard (offscreen).
+**Only testable with a real webcam:** live accuracy, camera reconnection, gesture control in everyday use,
+actual FPS on your hardware.
 
-Die Feature-Tabelle neu erzeugen: `python tools/gen_features.py`.
+Regenerate the feature table: `python tools/gen_features.py`.
 
-## Architektur
+## Architecture
 
 ```
 Butt3rFLYX/
-├── main.py                    Einstieg: Intro + Dashboard, Argumente, --legacy
-├── action_recognition_app.py  Originalprogramm (unverändert lauffähig)
-├── config.json                gespeicherte Einstellungen (wird erzeugt)
+├── main.py                    entry point: intro + dashboard, arguments, --legacy
+├── action_recognition_app.py  original program (still runnable unchanged)
+├── config.json                saved settings (generated)
 ├── models/                    yolo11n-pose.pt, hand_landmarker.task, face_landmarker.task
-├── core/                      KI-Logik, ohne GUI-Abhängigkeit
-│   ├── camera_manager.py      Kamera/Video + Reconnect
-│   ├── pose_detector.py       YOLO11-Pose + ByteTrack, Geräteauswahl
-│   ├── mediapipe_models.py    Hand-/Face-Landmarker auf Ausschnitten
-│   ├── person_tracker.py      stabile IDs, Wiedererkennung nach kurzem Verlust
-│   ├── posture.py             Einzelbild-Haltungsanalyse
-│   ├── motion_analyzer.py     zeitliche Analyse (Bewegung, Übergänge, Sport, Sturz)
-│   ├── hand_gestures.py       Finger, Gesten, Handbewegungen
-│   ├── head_pose.py           Kopfrichtung, Blick, Nicken/Schütteln
-│   ├── action_engine.py       Fusion + Ereignisse
-│   ├── pipeline.py            Ablauf pro Frame, parallele Ausführung
-│   ├── labels.py              Register aller Erkennungen (Status, Modell, DE/EN)
+├── core/                      AI logic, no GUI dependency
+│   ├── camera_manager.py      camera/video + reconnect
+│   ├── pose_detector.py       YOLO11-Pose + ByteTrack, device selection
+│   ├── mediapipe_models.py    hand/face landmarkers on crops
+│   ├── person_tracker.py      stable IDs, re-identification after short loss
+│   ├── posture.py             single-frame posture analysis
+│   ├── motion_analyzer.py     temporal analysis (movement, transitions, exercise, falls)
+│   ├── hand_gestures.py       fingers, gestures, hand movements
+│   ├── head_pose.py           head direction, gaze, nodding/shaking
+│   ├── action_engine.py       fusion + events
+│   ├── pipeline.py            per-frame flow, parallel execution
+│   ├── labels.py              registry of all detections (status, model, DE/EN)
 │   ├── gesture_control.py, face_identity.py, config.py, geometry.py
-├── ui/                        PySide6-Oberfläche
+├── ui/                        PySide6 interface
 │   ├── cyber_intro.py, main_window.py, dashboard.py, hud_renderer.py,
 │   ├── settings_window.py, worker.py, view_model.py, theme.py, i18n.py
 ├── logging_system/            event_logger.py, export_manager.py
-├── tests/                     99 automatische Tests
-├── tools/gen_features.py      erzeugt docs/features.md
+├── tests/                     99 automated tests
+├── tools/gen_features.py      generates docs/features.md
 ├── docs/                      features.md, architecture.md, limitations.md, README_original.md
-└── assets/                    logo/, sounds/ (Intro-Sound wird synthetisch erzeugt), animations/
+└── assets/                    logo/, sounds/ (intro sound is generated synthetically), animations/
 ```
 
 Details: [`docs/architecture.md`](docs/architecture.md).
 
-## Legacy-Modus
+## Legacy mode
 
-Das ursprüngliche OpenCV-Programm ist unverändert enthalten:
+The original OpenCV program is included unchanged:
 
 ```bash
-python main.py --legacy --mirror --log aktionen.csv
+python main.py --legacy --mirror --log actions.csv
 ```
 
-(alle Optionen von `action_recognition_app.py` werden durchgereicht; Original-README: `docs/README_original.md`).
+(all options of `action_recognition_app.py` are passed through; original README: `docs/README_original.md`).
