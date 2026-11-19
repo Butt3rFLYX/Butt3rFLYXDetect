@@ -1,0 +1,13 @@
+# Butt3rFLYX - tested with Python 3.13 on macOS (Apple Silicon)
+ultralytics>=8.3          # YOLO11-pose + ByteTrack (pulls in torch, opencv)
+opencv-python
+numpy
+lap                       # tracking assignment (ByteTrack)
+PySide6>=6.6              # desktop GUI
+mediapipe>=0.10.14        # Hand Landmarker + Face Landmarker (Tasks API)
+
+# development / tests
+pytest
+
+# optional, only for naming people from known_faces/ (OFF by default):
+# face_recognition

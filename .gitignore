@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# virtual environments (contain local paths)
+.venv/
+venv/
+env/
+
+# runtime data - may contain personal tracking data
+logs/
+recordings/
+known_faces/
+
+# macOS
+.DS_Store
+._*
+
+# IDEs
+.vscode/
+.idea/
